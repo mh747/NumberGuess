@@ -38,10 +38,10 @@
 
 		$('#new_game').submit(function(){
 			game_max_value = $( '#max_value' ).val();
-			var bodyReq = JSON.stringify({
+			var reqBody = JSON.stringify({
 				max_number: game_max_value
 			});
-			startNewGame(bodyReq, function(msg){
+			startNewGame(reqBody, function(msg){
 				game_id = msg.game_id;
 				secret = msg.secret_number;
 			});
@@ -64,9 +64,17 @@
 			storeTrial(reqBody, function(msg){
 				console.log(msg);
 			});
-			evalGuess(secret, number, game_max_value, '#game_feedback', function(endGame){
-				if(endGame) {
-					console.log('end game');
+			evalGuess(secret, number, game_max_value, '#game_feedback', function(end_game){
+				if(end_game) {
+					console.log('correct...ending game');
+					endGame(game_id, function(msg) {
+						console.log(msg);
+						$( '#active_game' ).fadeOut( "slow", function(){
+							$( '#new_game' ).fadeIn( "fast", function(){
+								//ready
+							});
+						});
+					});
 				}
 				$( '#guess' ).val('');
 			});

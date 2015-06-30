@@ -31,6 +31,9 @@ storeTrial = function(reqBody, callback) {
 evalGuess = function(secret, guess, max, feedback_element, callback) {
 	var correct = 0;
 	var message;
+	secret = +secret;
+	guess = +guess;
+	max = + max;
 	if(guess > secret) {
 		if(guess > max) {
 			message = "Guess is greater than max number.";
@@ -49,5 +52,21 @@ evalGuess = function(secret, guess, max, feedback_element, callback) {
 		$(feedback_element).fadeIn( "fast", function(){
 			return callback(correct);
 		});
+	});
+}
+
+endGame = function(game_id, callback) {
+	var reqBody = JSON.stringify({
+		game_status: "3"
+	});
+
+	$.ajax({
+		method: "PUT",
+		url: "http://localhost/NumberGuess/api/games/" + game_id,
+		data: reqBody,
+		contentType: 'application/json'
+	})
+	.done(function(msg){
+		callback(msg);
 	});
 }

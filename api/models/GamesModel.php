@@ -15,9 +15,9 @@ class GamesModel extends NumberGuessModel {
 		$sql = "SELECT * FROM games WHERE game_id=" . (int)$game_id;
 		$query = $this->db->prepare($sql);
 		$query->execute();
-		$data = $query->fetchAll(PDO::FETCH_ASSOC);
+		$data = $query->fetch(PDO::FETCH_ASSOC);
 
-		return $data[0];
+		return $data;
 	}
 
 	public function getGameByTrialId($trial_id) {
@@ -26,9 +26,9 @@ class GamesModel extends NumberGuessModel {
 
 		$query = $this->db->prepare($sql);
 		$query->execute();
-		$data = $query->fetchAll(PDO::FETCH_ASSOC);
+		$data = $query->fetch(PDO::FETCH_ASSOC);
 
-		return $data[0];
+		return $data;
 	}
 
 	public function getNewGame() {
@@ -48,9 +48,25 @@ class GamesModel extends NumberGuessModel {
 		$sql = "SELECT * from games WHERE game_id=" . $game_id;
 		$query = $this->db->prepare($sql);
 		$query->execute();
-		$data = $query->fetchAll(PDO::FETCH_ASSOC);
+		$data = $query->fetch(PDO::FETCH_ASSOC);
 
-		return $data[0];
+		return $data;
+	}
+
+	public function updateGame($game_id) {
+		$game_status = $this->request->parameters['game_status'];
+		$sql = "UPDATE games SET game_status=:game_status WHERE game_id=" . (int)$game_id;
+		$fields = array("game_status"=>$game_status);
+		$query = $this->db->prepare($sql);
+		$query->execute($fields);
+
+		//select record for return value
+		$sql = "SELECT * FROM games WHERE game_id=" . (int)$game_id;
+		$query = $this->db->prepare($sql);
+		$query->execute();
+		$data = $query->fetch(PDO::FETCH_ASSOC);
+
+		return $data;
 	}
 }
 

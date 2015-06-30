@@ -54,4 +54,22 @@ class GamesController extends NumberGuessController {
 
 		return $data;
 	}
+
+	public function putAction($request) {
+		if(isset($request->url_elements[2])) {
+			$game_id = $request->url_elements[2];
+			if(isset($request->parameters['game_status'])) {
+				$games = new GamesModel($request);
+				$data = $games->updateGame($game_id);
+			} else {
+				//Record will be unchanged
+				$games = new GamesModel($request);
+				$data = $games->getGameById($game_id);
+			}
+		} else {
+			$data['message'] = "Game ID to be changed must be sent in url";
+		}
+
+		return $data;
+	}
 }
