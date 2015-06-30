@@ -1,0 +1,57 @@
+<?php
+
+class GamesController extends NumberGuessController {
+	public function getAction($request) {
+		//Implement get -- should give statistics
+		//$data['message'] = 'GET request to /api/games';
+		if(isset($request->url_elements[2])) {
+			$game_id = (int)$request->url_elements[2];
+
+			if(isset($request->url_elements[3])) {
+				switch($request->url_elements[3]) {
+					case 'trials':
+						$trials = new TrialsModel($request);
+						$data = $trials->getTrialsByGameId($game_id);
+						break;
+					default:
+						$data['message'] = "Unsupported action";
+				}
+			} else {
+				$games = new GamesModel($request);
+				$data = $games->getGameById($game_id);
+			}
+		} else {
+			$games = new GamesModel($request);
+			$data = $games->getAllGames();
+		}
+
+		return $data;
+	}
+
+	/*Function postAction
+		Takes in a Request object containing info on the incoming http request
+		Request should contain a number, which is the max number. This will be 
+		read and a secret number will be calculated, and the new game instance 
+		will be added to the games table. Returns (int) secret number.
+	*/
+	public function postAction($request) {
+		//Function called to start new game on front-end
+
+		//Making sure correct URI is called, must be /api/games, nothing after
+		if(!(isset($request->url_elements[2]))) {
+			if(isset($request->parameters['max_number'])) {
+				$games = new GamesModel($request);
+				$data = $games->getNewGame();
+			} else {
+				//Max number not set --- return 400 bad request
+				$data["message"] = "Must pass in max_number field in http request body";
+				$data["request"] = $request;
+			}
+		} else {
+			//Bad request - invalid url
+			$data["message"] = "Bad Request - Invalid URL";
+		}
+
+		return $data;
+	}
+}
