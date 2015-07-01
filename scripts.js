@@ -36,15 +36,15 @@ evalGuess = function(secret, guess, max, feedback_element, callback) {
 	max = + max;
 	if(guess > secret) {
 		if(guess > max) {
-			message = "Guess is greater than max number.";
+			message = "<div class='alert alert-danger'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is greater than max number.</div>";
 		} else {
-			message = "Guess is greater than secret.";
+			message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is greater than secret.</div>";
 		}
 	} else if(guess < secret) {
-		message = "Guess is less than secret.";
+		message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is less than secret.</div>";
 	} else if(guess == secret) {
 		correct = 1;
-		message = "You are correct!";
+		message = "<div class='alert alert-success'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>You are correct!</div>";
 	}
 
 	$(feedback_element).fadeOut( "slow", function(){
@@ -68,5 +68,33 @@ endGame = function(game_id, callback) {
 	})
 	.done(function(msg){
 		callback(msg);
+	});
+}
+
+abandonGame = function(game_id, callback) {
+	var reqBody = JSON.stringify({
+		game_status: "2"
+	});
+
+	$.ajax({
+		method: "PUT",
+		url: "http://localhost/NumberGuess/api/games/" + game_id,
+		data: reqBody,
+		contentType: 'application/json'
+	})
+	.done(function(msg){
+		callback(msg);
+	});
+}
+
+collectStats = function(callback) {
+
+	$.ajax({
+		method: "GET",
+		url: "http://localhost/NumberGuess/api/stats",
+		contentType: 'application/json'
+	})
+	.done(function(msg){
+		return callback(msg);
 	});
 }

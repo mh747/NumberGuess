@@ -1,34 +1,68 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Number Guess</title>
 </head>
 
 <body>
-	<h2>Number Guess</h2>
-	<br><br>
-	<div id='game_form_area'>
-		<form name='new_game' id='new_game'>
-			Enter Max Value: <input type='text' id='max_value'>
-			<input type='submit' value='Start New Game'>
-		</form>
-		<form name='active_game' id='active_game'>
-			Guess! <input type='text' id='guess'>
-			<input type='submit' value='Guess'>
-		</form>
+	<div class='container-fluid'>
+		<h2>Number Guess<br> 
+			<small>See if you can guess the number...</small></h2>
+		<ul class="nav nav-tabs">
+    		<li class="active" id='game_tab'><a href="#" id='game_link'>Game</a></li>
+    		<li id='stats_tab'><a href='#' id='stats_link'>Stats</a></li>
+    	</ul>
+    	<br>
+    	<div id='game'>
+			<div class='row'>
+				<div class='col-sm-5'>
+					<div class='panel panel-default'>
+						<div class='panel-heading'>Current Game</div>
+						<div class='panel-content' id='game_form_area'>
+							<form name='new_game' id='new_game'>
+								Enter Max Value: <br><input type='text' id='max_value'>
+								<input type='submit' class='btn btn-primary btn-sm' value='Start New Game!'>
+							</form>
+							<form name='active_game' id='active_game'>
+								Guess! <br><input type='text' id='guess'>
+								<input type='submit' class='btn btn-primary btn-sm' value=' ? Guess'>
+							</form>
+						</div>
+						<div class='panel-footer' id='game_feedback'>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id='stats'>
+			<div class='row'>
+				<div class='col-sm-12' id='stats_area'>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class='row'>
+			<div class='col-sm-4'>
+			</div>
+		</div>
 	</div>
-	<br>
-	<div id='game_feedback'>
-	</div>
-
 
 	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
 	<script src="scripts.js"></script>
 	<script>
 		$('#new_game').hide();
 		$('#active_game').hide();
+		$('#stats').hide();
 		var game_max_value;
 		var secret;
 		var game_id;
+		var tab = 'game';
+		var active_game = false;
 
 		$( document ).ready(function(){
 			$('#new_game').fadeIn( "slow", function(){
@@ -37,6 +71,7 @@
 		});
 
 		$('#new_game').submit(function(){
+			active_game = true;
 			game_max_value = $( '#max_value' ).val();
 			var reqBody = JSON.stringify({
 				max_number: game_max_value
@@ -67,6 +102,7 @@
 			evalGuess(secret, number, game_max_value, '#game_feedback', function(end_game){
 				if(end_game) {
 					console.log('correct...ending game');
+					active_game = false;
 					endGame(game_id, function(msg) {
 						console.log(msg);
 						$( '#active_game' ).fadeOut( "slow", function(){
@@ -81,7 +117,109 @@
 
 			return false;
 		});
+
+		$('#game_link').click(function(){
+			if(tab != 'game') {
+				$('#game_tab').addClass('active');
+				$('#stats_tab').removeClass('active');
+				$('#stats').fadeOut( "slow", function(){
+					$('#game').fadeIn( "slow", function(){
+						tab = 'game';
+					});
+				});
+			}
+
+			return false;
+		});
+
+		$('#stats_link').click(function(){
+			if(tab != 'stats') {
+				$('#stats_area').empty();
+				$('#stats_tab').addClass('active');
+				$('#game_tab').removeClass('active');
+				$('#game').fadeOut( "slow", function(){
+					$('#stats').fadeIn( "slow", function(){
+						tab = 'stats';
+					});
+				});
+
+				collectStats(function(res){
+					/*var table = "<table class='table table-bordered'>";
+					table += '<thead><tr><th>Game ID</th><th>Max Number</th><th>Secret Number</th>';
+					table += '<th>Game Start Time</th><th>Game Status</th><th>Number Guess</th>';
+					table += '<th>Trial Time</th></tr></thead>';
+					table += "<tbody>";
+
+					var currGame = -1;
+					console.log(currGame);
+					for(var i=0; i<res.length; i++) {
+						table += "<tr>";
+						if(currGame != res[i].game_id) {
+							currGame = res[i].game_id;
+							if(i>0)
+								table += "<td colspan=7></td></tr><tr>";
+							table += "<td><strong>" + res[i].game_id + "</strong></td>";
+							table += "<td><strong>" + res[i].max_number + "</strong></td>";
+							table += "<td><strong>" + res[i].secret_number + "</strong></td>";
+							table += "<td><strong>" + res[i].start_time + "</strong></td>";
+							table += "<td><strong>" + res[i].game_status + "</strong></td>";
+						} else {
+							table += "<td colspan=5></td>";
+						}
+
+						table += "<td>" + res[i].number + "</td>";
+						table += "<td>" + res[i].trial_time + "</td>";
+						table += "</tr>";
+					}
+					table += "</tbody></table";*/
+					var statusArr = {
+						1: "Active",
+						2: "Abandoned",
+						3: "Completed"
+					};
+					var currGame = -1;
+					for(var i=0; i<res.length; i++) {
+						if(res[i].game_id != currGame) {
+							var table = "";
+							currGame = res[i].game_id;
+							if(res[i].game_status == 3)
+								table += "<div class='panel panel-success'>";
+							if(res[i].game_status == 2)
+								table += "<div class='panel panel-danger'>";
+							if(res[i].game_status == 1)
+								table += "<div class='panel panel-default'>";
+
+							table += "<div class='panel-heading'><strong>Game ID: </strong>" + res[i].game_id + "</div>";
+							table += "<div class='panel-content'>";
+							table += "<strong>Max Number: </strong>" + res[i].max_number + "<br>";
+							table += "<strong>Secret Number: </strong>" + res[i].secret_number + "<br>";
+							table += "<strong>Game Start: </strong>" + res[i].start_time + "<br>";
+							table += "<strong>Game Status: </strong>" + statusArr[res[i].game_status] + "<br>";
+							table += "<strong>Trials: </strong><br><ul id='game_" + res[i].game_id + "'>";
+							table += "</ul></div><div class='panel panel-footer'></div></div>";
+							$('#stats_area').append(table);
+						} else {
+							var trial = "<li><strong>Guess: </strong>" + res[i].number + " <strong>Time: </strong>" + res[i].trial_time + "</li>";
+							$('#game_' + res[i].game_id).append( trial );
+						}
+					}
+				});
+			}
+
+			return false;
+		});
+
+		$(window).bind('beforeunload', function(){
+			if(active_game) {
+				abandonGame(game_id, function(msg){
+					console.log('abandoned game.');
+					console.log(msg);
+				});
+			}
+		});
+
 	</script>
 
+</div>
 </body>
 </html>
