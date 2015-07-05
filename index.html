@@ -196,6 +196,8 @@
 							table += "<strong>Game Start: </strong>" + res[i].start_time + "<br>";
 							table += "<strong>Game Status: </strong>" + statusArr[res[i].game_status] + "<br>";
 							table += "<strong>Trials: </strong><br><ul id='game_" + res[i].game_id + "'>";
+							if(res[i].number)
+								table += "<li><strong>Guess: </strong>" + res[i].number + " <strong>Time: </strong>" + res[i].trial_time + "</li>";
 							table += "</ul></div><div class='panel panel-footer'></div></div>";
 							$('#stats_area').append(table);
 						} else {
