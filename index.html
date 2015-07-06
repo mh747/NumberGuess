@@ -101,7 +101,6 @@
 						console.log('correct...ending game');
 						active_game = false;
 						endGame(game_id, function(msg) {
-							console.log(msg);
 							$( '#active_game' ).fadeOut( "slow", function(){
 								$( '#new_game' ).fadeIn( "fast", function(){
 									//ready
