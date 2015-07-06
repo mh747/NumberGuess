@@ -15,9 +15,9 @@ class TrialsModel extends NumberGuessModel {
 		$sql = "SELECT * FROM trials WHERE trial_id=" . (int)$trial_id;
 		$query = $this->db->prepare($sql);
 		$query->execute();
-		$data = $query->fetchAll(PDO::FETCH_ASSOC);
+		$data = $query->fetch(PDO::FETCH_ASSOC);
 
-		return $data[0];
+		return $data;
 	}
 
 	public function getTrialsByGameId($game_id) {
@@ -39,11 +39,11 @@ class TrialsModel extends NumberGuessModel {
 
 		//Getting row for return value
 		$trial_id = $this->db->lastInsertId();
-		$sql = "SELECT * FROM trials WHERE trial_id=" . $trial_id;
+		$sql = "SELECT g.secret_number, t.number FROM games g, trials t WHERE t.game_id=g.game_id AND trial_id=" . $trial_id;
 		$query = $this->db->prepare($sql);
 		$query->execute();
-		$data = $query->fetchAll(PDO::FETCH_ASSOC);
+		$data = $query->fetch(PDO::FETCH_ASSOC);
 
-		return $data[0];
+		return $data;
 	}
 }

@@ -59,7 +59,6 @@
 		$('#active_game').hide();
 		$('#stats').hide();
 		var game_max_value;
-		var secret;
 		var game_id;
 		var tab = 'game';
 		var active_game = false;
@@ -78,7 +77,6 @@
 			});
 			startNewGame(reqBody, function(msg){
 				game_id = msg.game_id;
-				secret = msg.secret_number;
 			});
 
 			$( '#new_game' ).fadeOut( "slow", function(){
@@ -98,21 +96,21 @@
 			});
 			storeTrial(reqBody, function(msg){
 				console.log(msg);
-			});
-			evalGuess(secret, number, game_max_value, '#game_feedback', function(end_game){
-				if(end_game) {
-					console.log('correct...ending game');
-					active_game = false;
-					endGame(game_id, function(msg) {
-						console.log(msg);
-						$( '#active_game' ).fadeOut( "slow", function(){
-							$( '#new_game' ).fadeIn( "fast", function(){
-								//ready
+				evalGuess(msg, number, game_max_value, '#game_feedback', function(end_game) {
+					if(end_game) {
+						console.log('correct...ending game');
+						active_game = false;
+						endGame(game_id, function(msg) {
+							console.log(msg);
+							$( '#active_game' ).fadeOut( "slow", function(){
+								$( '#new_game' ).fadeIn( "fast", function(){
+									//ready
+								});
 							});
 						});
-					});
-				}
-				$( '#guess' ).val('');
+					}
+					$( '#guess' ).val('');
+				});
 			});
 
 			return false;
@@ -172,37 +170,43 @@
 						table += "</tr>";
 					}
 					table += "</tbody></table";*/
+
+					//Displaying totals at top
+					var totals = "<div class='row'><div class=col-sm-4><strong>Total Games:</strong> " + res['totals']['Total'] + "</div>";
+					totals += "<div class='col-sm-4'><strong>Completed:</strong> " + res['totals']['Completed'] + "</div>";
+					totals += "<div class='col-sm-4'><strong>Abandoned:</strong> " + res['totals']['Abandoned'] + "</div></div>";
+					$( '#stats_area' ).append(totals);
 					var statusArr = {
 						1: "Active",
 						2: "Abandoned",
 						3: "Completed"
 					};
 					var currGame = -1;
-					for(var i=0; i<res.length; i++) {
-						if(res[i].game_id != currGame) {
+					for(var i=0; i<res['stats'].length; i++) {
+						if(res['stats'][i].game_id != currGame) {
 							var table = "";
-							currGame = res[i].game_id;
-							if(res[i].game_status == 3)
+							currGame = res['stats'][i].game_id;
+							if(res['stats'][i].game_status == 3)
 								table += "<div class='panel panel-success'>";
-							if(res[i].game_status == 2)
+							if(res['stats'][i].game_status == 2)
 								table += "<div class='panel panel-danger'>";
-							if(res[i].game_status == 1)
+							if(res['stats'][i].game_status == 1)
 								table += "<div class='panel panel-default'>";
 
-							table += "<div class='panel-heading'><strong>Game ID: </strong>" + res[i].game_id + "</div>";
+							table += "<div class='panel-heading'><strong>Game ID: </strong>" + res['stats'][i].game_id + "</div>";
 							table += "<div class='panel-content'>";
-							table += "<strong>Max Number: </strong>" + res[i].max_number + "<br>";
-							table += "<strong>Secret Number: </strong>" + res[i].secret_number + "<br>";
-							table += "<strong>Game Start: </strong>" + res[i].start_time + "<br>";
-							table += "<strong>Game Status: </strong>" + statusArr[res[i].game_status] + "<br>";
-							table += "<strong>Trials: </strong><br><ul id='game_" + res[i].game_id + "'>";
-							if(res[i].number)
-								table += "<li><strong>Guess: </strong>" + res[i].number + " <strong>Time: </strong>" + res[i].trial_time + "</li>";
+							table += "<strong>Max Number: </strong>" + res['stats'][i].max_number + "<br>";
+							table += "<strong>Secret Number: </strong>" + res['stats'][i].secret_number + "<br>";
+							table += "<strong>Game Start: </strong>" + res['stats'][i].start_time + "<br>";
+							table += "<strong>Game Status: </strong>" + statusArr[res['stats'][i].game_status] + "<br>";
+							table += "<strong>Trials: </strong><br><ul id='game_" + res['stats'][i].game_id + "'>";
+							if(res['stats'][i].number)
+								table += "<li><strong>Guess: </strong>" + res['stats'][i].number + " <strong>Time: </strong>" + res['stats'][i].trial_time + "</li>";
 							table += "</ul></div><div class='panel panel-footer'></div></div>";
 							$('#stats_area').append(table);
 						} else {
-							var trial = "<li><strong>Guess: </strong>" + res[i].number + " <strong>Time: </strong>" + res[i].trial_time + "</li>";
-							$('#game_' + res[i].game_id).append( trial );
+							var trial = "<li><strong>Guess: </strong>" + res['stats'][i].number + " <strong>Time: </strong>" + res['stats'][i].trial_time + "</li>";
+							$('#game_' + res['stats'][i].game_id).append( trial );
 						}
 					}
 				});

@@ -3,7 +3,7 @@
 class GamesModel extends NumberGuessModel {
 
 	public function getAllGames() {
-		$sql = "SELECT * FROM games";
+		$sql = "SELECT * FROM games WHERE game_status <> 1";
 		$query = $this->db->prepare($sql);
 		$query->execute();
 		$data = $query->fetchAll(PDO::FETCH_ASSOC);
@@ -44,11 +44,11 @@ class GamesModel extends NumberGuessModel {
 		$query->execute();
 
 		//Getting row to return 
-		$game_id = $this->db->lastInsertId();
-		$sql = "SELECT * from games WHERE game_id=" . $game_id;
+		$data['game_id'] = $this->db->lastInsertId();
+		/*$sql = "SELECT * from games WHERE game_id=" . $game_id;
 		$query = $this->db->prepare($sql);
 		$query->execute();
-		$data = $query->fetch(PDO::FETCH_ASSOC);
+		$data = $query->fetch(PDO::FETCH_ASSOC);*/
 
 		return $data;
 	}

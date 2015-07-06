@@ -18,7 +18,12 @@ class GamesController extends NumberGuessController {
 				}
 			} else {
 				$games = new GamesModel($request);
-				$data = $games->getGameById($game_id);
+				$game = $games->getGameById($game_id);
+				if($game['game_status'] == 1) {
+					$data['message'] = "Nice try. No cheating allowed.";
+				} else {
+					$data = $game;
+				}
 			}
 		} else {
 			$games = new GamesModel($request);
@@ -45,7 +50,6 @@ class GamesController extends NumberGuessController {
 			} else {
 				//Max number not set --- return 400 bad request
 				$data["message"] = "Must pass in max_number field in http request body";
-				$data["request"] = $request;
 			}
 		} else {
 			//Bad request - invalid url
@@ -59,8 +63,12 @@ class GamesController extends NumberGuessController {
 		if(isset($request->url_elements[2])) {
 			$game_id = $request->url_elements[2];
 			if(isset($request->parameters['game_status'])) {
-				$games = new GamesModel($request);
-				$data = $games->updateGame($game_id);
+				if($request->parameters['game_status'] != 1) {
+					$games = new GamesModel($request);
+					$data = $games->updateGame($game_id);
+				} else {
+					$data['message'] = "Cannot reactivate a completed or abandoned game.";
+				}
 			} else {
 				//Record will be unchanged
 				$games = new GamesModel($request);

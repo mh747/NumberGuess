@@ -28,21 +28,21 @@ storeTrial = function(reqBody, callback) {
 	});
 }
 
-evalGuess = function(secret, guess, max, feedback_element, callback) {
+evalGuess = function(msg, number, max, feedback_element, callback) {
 	var correct = 0;
+	var difference = msg.difference;
 	var message;
-	secret = +secret;
-	guess = +guess;
 	max = + max;
-	if(guess > secret) {
-		if(guess > max) {
+	number = +number;
+	if(difference > 0) {
+		if(number > max) {
 			message = "<div class='alert alert-danger'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is greater than max number.</div>";
 		} else {
 			message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is greater than secret.</div>";
 		}
-	} else if(guess < secret) {
+	} else if(difference < 0) {
 		message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is less than secret.</div>";
-	} else if(guess == secret) {
+	} else if(difference == 0) {
 		correct = 1;
 		message = "<div class='alert alert-success'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>You are correct!</div>";
 	}
