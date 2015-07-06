@@ -24,11 +24,11 @@
 						<div class='panel-content' id='game_form_area'>
 							<form name='new_game' id='new_game'>
 								Enter Max Value: <br><input type='text' id='max_value'>
-								<input type='submit' class='btn btn-primary btn-sm' value='Start New Game!'>
+								<input type='submit' id='max_submit' class='btn btn-primary btn-sm' value='Start New Game!'>
 							</form>
 							<form name='active_game' id='active_game'>
 								Guess! <br><input type='text' id='guess'>
-								<input type='submit' class='btn btn-primary btn-sm' value=' ? Guess'>
+								<input type='submit' id='guess_submit' class='btn btn-primary btn-sm' value=' ? Guess'>
 							</form>
 						</div>
 						<div class='panel-footer' id='game_feedback'>
@@ -69,48 +69,81 @@
 			});
 		});
 
-		$('#new_game').submit(function(){
-			active_game = true;
-			game_max_value = $( '#max_value' ).val();
-			var reqBody = JSON.stringify({
-				max_number: game_max_value
-			});
-			startNewGame(reqBody, function(msg){
-				game_id = msg.game_id;
-			});
+		$('#max_value').keyup(function(){
+			if(isNaN($('#max_value').val())) {
+				var message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Max value must be a number</div>";
+				$('#max_submit').addClass('disabled');
+			} else if($('#max_value').val() <= 1) {
+				var message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Max value must greater than 1.</div>";
+				$('#max_submit').addClass('disabled');
+			} else {
+				var message = "";
+				$('#max_submit').removeClass('disabled');
+			}
 
-			$( '#new_game' ).fadeOut( "slow", function(){
-				$( '#active_game' ).fadeIn( "fast", function(){
-					//ready
+			$('#game_feedback').html( message );
+
+		});
+
+		$('#new_game').submit(function(){
+			if(!($('#max_submit').hasClass('disabled'))) {
+				active_game = true;
+				game_max_value = $( '#max_value' ).val();
+				var reqBody = JSON.stringify({
+					max_number: game_max_value
 				});
-			});
+				startNewGame(reqBody, function(msg){
+					game_id = msg.game_id;
+				});
+
+				$( '#new_game' ).fadeOut( "slow", function(){
+					$( '#active_game' ).fadeIn( "fast", function(){
+					//ready
+					});
+				});
+			}
 
 			return false;
 		});
 
+		$('#guess').keyup(function(){
+			if(isNaN($('#guess').val())) {
+				var message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess must be a number</div>";
+				$('#guess_submit').addClass('disabled');
+			} else {
+				var message = "";
+				$('#guess_submit').removeClass('disabled');
+			}
+
+			$('#game_feedback').html( message );
+
+		});
+
 		$('#active_game').submit(function(){
-			var number = $( '#guess' ).val();
-			var reqBody = JSON.stringify({
-				'number': number,
-				'game_id': game_id
-			});
-			storeTrial(reqBody, function(msg){
-				console.log(msg);
-				evalGuess(msg, number, game_max_value, '#game_feedback', function(end_game) {
-					if(end_game) {
-						console.log('correct...ending game');
-						active_game = false;
-						endGame(game_id, function(msg) {
-							$( '#active_game' ).fadeOut( "slow", function(){
-								$( '#new_game' ).fadeIn( "fast", function(){
-									//ready
+			if(!($('#guess_submit').hasClass('disabled'))) {
+				var number = $( '#guess' ).val();
+				var reqBody = JSON.stringify({
+					'number': number,
+					'game_id': game_id
+				});
+				storeTrial(reqBody, function(msg){
+					console.log(msg);
+					evalGuess(msg, number, game_max_value, '#game_feedback', function(end_game) {
+						if(end_game) {
+							console.log('correct...ending game');
+							active_game = false;
+							endGame(game_id, function(msg) {
+								$( '#active_game' ).fadeOut( "slow", function(){
+									$( '#new_game' ).fadeIn( "fast", function(){
+										//ready
+									});
 								});
 							});
-						});
-					}
-					$( '#guess' ).val('');
+						}
+						$( '#guess' ).val('');
+					});
 				});
-			});
+			}
 
 			return false;
 		});
