@@ -36,7 +36,7 @@ class GamesModel extends NumberGuessModel {
 		//$data['message'] = 'the number is ' . $max_number;
 
 		//Generating secret number
-		$secret_number = rand(0, $max_number);
+		$secret_number = rand(1, $max_number);
 
 		//Adding new game record to 'games' table
 		$sql = "INSERT INTO games (max_number, secret_number, game_status) VALUES(" . $max_number . "," . $secret_number . ", 1)";
@@ -55,7 +55,8 @@ class GamesModel extends NumberGuessModel {
 
 	public function updateGame($game_id) {
 		$game_status = $this->request->parameters['game_status'];
-		$sql = "UPDATE games SET game_status=:game_status WHERE game_id=" . (int)$game_id;
+		$sql = "UPDATE games SET game_status=:game_status," . 
+			"game_duration=(SELECT TIMESTAMPDIFF(SECOND,start_time,NOW())) WHERE game_id=" . (int)$game_id;
 		$fields = array("game_status"=>$game_status);
 		$query = $this->db->prepare($sql);
 		$query->execute($fields);

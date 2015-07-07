@@ -36,12 +36,12 @@ evalGuess = function(msg, number, max, feedback_element, callback) {
 	number = +number;
 	if(difference > 0) {
 		if(number > max) {
-			message = "<div class='alert alert-danger'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is greater than max number.</div>";
+			message = "<div class='alert alert-danger'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Sorry, " + number + " is greater than the max number.</div>";
 		} else {
-			message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is greater than secret.</div>";
+			message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Sorry, " + number + " is greater than the secret number.</div>";
 		}
 	} else if(difference < 0) {
-		message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Guess is less than secret.</div>";
+		message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Sorry, " + number + " is less than the secret number.</div>";
 	} else if(difference == 0) {
 		correct = 1;
 		message = "<div class='alert alert-success'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>You are correct!</div>";
@@ -64,6 +64,17 @@ endGame = function(game_id, callback) {
 		method: "PUT",
 		url: "http://localhost/NumberGuess/api/games/" + game_id,
 		data: reqBody,
+		contentType: 'application/json'
+	})
+	.done(function(msg){
+		callback(msg);
+	});
+}
+
+getGameLog = function(game_id, callback) {
+	$.ajax({
+		method: "GET",
+		url: "http://localhost/NumberGuess/api/stats/" + game_id,
 		contentType: 'application/json'
 	})
 	.done(function(msg){

@@ -17,6 +17,15 @@ class StatsModel extends NumberGuessModel {
 
 		return $data;
 	}
+
+	public function getStatsByGameId($game_id) {
+		$sql = "SELECT g.*, t.number, t.trial_time from games g LEFT JOIN trials t on g.game_id=t.game_id WHERE g.game_id=" . (int)$game_id . " ORDER BY g.start_time,t.trial_time";
+		$query = $this->db->prepare($sql);
+		$query->execute();
+		$data = $query->fetchAll(PDO::FETCH_ASSOC);
+
+		return $data;	
+	}
 }
 
 ?>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="styles.css">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Number Guess</title>
@@ -10,7 +11,7 @@
 <body>
 	<div class='container-fluid'>
 		<h2>Number Guess<br> 
-			<small>See if you can guess the number...</small></h2>
+			<small><i>See if you can guess the number...</i></small></h2>
 		<ul class="nav nav-tabs">
     		<li class="active" id='game_tab'><a href="#" id='game_link'>Game</a></li>
     		<li id='stats_tab'><a href='#' id='stats_link'>Stats</a></li>
@@ -19,7 +20,7 @@
     	<div id='game'>
 			<div class='row'>
 				<div class='col-sm-5'>
-					<div class='panel panel-default'>
+					<div class='panel panel-primary'>
 						<div class='panel-heading'>Current Game</div>
 						<div class='panel-content' id='game_form_area'>
 							<form name='new_game' id='new_game'>
@@ -139,6 +140,15 @@
 									});
 								});
 							});
+							getGameLog(game_id, function(msg) {
+								var log = "<strong>Game Log:</strong><br>";
+								log += "<strong>Game Started at </strong>" + msg[0].start_time + "<br><br><ul>";
+								for(var i=0; i<msg.length; i++) {
+									log += "<li>Guess #" + (i+1) + ": Number " + msg[i].number + " at " + msg[i].trial_time + "</li>";
+								}
+								log += "</ul><br><br><strong>Game completed in </strong>" + msg[0].game_duration + " seconds.";
+								$('#game_feedback').append(log);
+							})
 						}
 						$( '#guess' ).val('');
 					});
@@ -204,6 +214,8 @@
 					table += "</tbody></table";*/
 
 					//Displaying totals at top
+					res['totals']['Completed'] = (res['totals']['Completed']) ? res['totals']['Completed'] : 0;
+					res['totals']['Abandoned'] = (res['totals']['Abandoned']) ? res['totals']['Abandoned'] : 0;
 					var totals = "<div class='row'><div class=col-sm-4><strong>Total Games:</strong> " + res['totals']['Total'] + "</div>";
 					totals += "<div class='col-sm-4'><strong>Completed:</strong> " + res['totals']['Completed'] + "</div>";
 					totals += "<div class='col-sm-4'><strong>Abandoned:</strong> " + res['totals']['Abandoned'] + "</div></div>";
@@ -231,6 +243,7 @@
 							table += "<strong>Secret Number: </strong>" + res['stats'][i].secret_number + "<br>";
 							table += "<strong>Game Start: </strong>" + res['stats'][i].start_time + "<br>";
 							table += "<strong>Game Status: </strong>" + statusArr[res['stats'][i].game_status] + "<br>";
+							table += "<strong>Game Duration: </strong>" + res['stats'][i].game_duration + " seconds<br>";
 							table += "<strong>Trials: </strong><br><ul id='game_" + res['stats'][i].game_id + "'>";
 							if(res['stats'][i].number)
 								table += "<li><strong>Guess: </strong>" + res['stats'][i].number + " <strong>Time: </strong>" + res['stats'][i].trial_time + "</li>";
