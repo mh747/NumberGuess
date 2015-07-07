@@ -71,7 +71,10 @@
 		});
 
 		$('#max_value').keyup(function(){
-			if(isNaN($('#max_value').val())) {
+			if($('#max_value').val() == '') {
+				var message = "";
+				$('max_submit').removeClass('disabled');	
+			} else if(isNaN($('#max_value').val())) {
 				var message = "<div class='alert alert-warning'><a href='#'' class='close' data-dismiss='alert' aria-label='close'>&times;</a>Max value must be a number</div>";
 				$('#max_submit').addClass('disabled');
 			} else if($('#max_value').val() <= 1) {
@@ -184,35 +187,6 @@
 				});
 
 				collectStats(function(res){
-					/*var table = "<table class='table table-bordered'>";
-					table += '<thead><tr><th>Game ID</th><th>Max Number</th><th>Secret Number</th>';
-					table += '<th>Game Start Time</th><th>Game Status</th><th>Number Guess</th>';
-					table += '<th>Trial Time</th></tr></thead>';
-					table += "<tbody>";
-
-					var currGame = -1;
-					console.log(currGame);
-					for(var i=0; i<res.length; i++) {
-						table += "<tr>";
-						if(currGame != res[i].game_id) {
-							currGame = res[i].game_id;
-							if(i>0)
-								table += "<td colspan=7></td></tr><tr>";
-							table += "<td><strong>" + res[i].game_id + "</strong></td>";
-							table += "<td><strong>" + res[i].max_number + "</strong></td>";
-							table += "<td><strong>" + res[i].secret_number + "</strong></td>";
-							table += "<td><strong>" + res[i].start_time + "</strong></td>";
-							table += "<td><strong>" + res[i].game_status + "</strong></td>";
-						} else {
-							table += "<td colspan=5></td>";
-						}
-
-						table += "<td>" + res[i].number + "</td>";
-						table += "<td>" + res[i].trial_time + "</td>";
-						table += "</tr>";
-					}
-					table += "</tbody></table";*/
-
 					//Displaying totals at top
 					res['totals']['Completed'] = (res['totals']['Completed']) ? res['totals']['Completed'] : 0;
 					res['totals']['Abandoned'] = (res['totals']['Abandoned']) ? res['totals']['Abandoned'] : 0;
